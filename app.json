@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "Darb",
+    "slug": "darb",
+    "scheme": "darb",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0F1C36"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ps.darb.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Darb uses your location to show you on the map next to your customers and today's route."
+      }
+    },
+    "android": {
+      "package": "ps.darb.app",
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "adaptiveIcon": {
+        "backgroundColor": "#0F1C36"
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "RECORD_AUDIO",
+        "VIBRATE"
+      ]
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Darb uses the microphone so you can dictate a customer order in Arabic.",
+          "speechRecognitionPermission": "Darb uses speech recognition to turn your spoken Arabic order into text."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Darb uses your location to show you on the map next to your customers and today's route."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
