@@ -1,0 +1,55 @@
+import { Platform, type ViewStyle } from 'react-native';
+
+type Level = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+/**
+ * Two-layer depth: a tight contact shadow that grounds a surface plus a soft,
+ * wide ambient one that lifts it. Web renders both; native platforms take the
+ * ambient layer (iOS) or an elevation (Android).
+ */
+const INK = '#0A1326';
+
+const ios: Record<Level, ViewStyle> = {
+  none: {},
+  xs: { shadowColor: INK, shadowOpacity: 0.06, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
+  sm: { shadowColor: INK, shadowOpacity: 0.07, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } },
+  md: { shadowColor: INK, shadowOpacity: 0.09, shadowRadius: 22, shadowOffset: { width: 0, height: 10 } },
+  lg: { shadowColor: INK, shadowOpacity: 0.12, shadowRadius: 32, shadowOffset: { width: 0, height: 16 } },
+  xl: { shadowColor: INK, shadowOpacity: 0.16, shadowRadius: 48, shadowOffset: { width: 0, height: 24 } },
+};
+
+const android: Record<Level, ViewStyle> = {
+  none: {},
+  xs: { elevation: 1, shadowColor: INK },
+  sm: { elevation: 3, shadowColor: INK },
+  md: { elevation: 5, shadowColor: INK },
+  lg: { elevation: 8, shadowColor: INK },
+  xl: { elevation: 12, shadowColor: INK },
+};
+
+const web: Record<Level, ViewStyle> = {
+  none: {},
+  xs: { boxShadow: '0 1px 2px rgba(10,19,38,0.06)' } as ViewStyle,
+  sm: { boxShadow: '0 1px 2px rgba(10,19,38,0.05), 0 6px 16px -4px rgba(10,19,38,0.08)' } as ViewStyle,
+  md: { boxShadow: '0 1px 3px rgba(10,19,38,0.06), 0 12px 28px -8px rgba(10,19,38,0.14)' } as ViewStyle,
+  lg: { boxShadow: '0 2px 6px rgba(10,19,38,0.06), 0 22px 44px -12px rgba(10,19,38,0.20)' } as ViewStyle,
+  xl: { boxShadow: '0 4px 10px rgba(10,19,38,0.08), 0 32px 64px -16px rgba(10,19,38,0.28)' } as ViewStyle,
+};
+
+export const shadow: Record<Level, ViewStyle> = Platform.select({
+  ios,
+  android,
+  default: web,
+}) as Record<Level, ViewStyle>;
+
+/** Coloured depth for the primary CTA — used sparingly. */
+export const brandGlow: ViewStyle = Platform.select({
+  ios: { shadowColor: '#1B3157', shadowOpacity: 0.18, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
+  android: { elevation: 4, shadowColor: '#1B3157' },
+  default: {
+    // The inset line is a hairline of light along the top edge.
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(15,28,54,0.18), 0 6px 14px -6px rgba(27,49,87,0.36)',
+  } as ViewStyle,
+}) as ViewStyle;
+
+export type ShadowLevel = Level;
