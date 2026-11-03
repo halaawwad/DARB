@@ -1,7 +1,7 @@
 # درب (Darb)
 
 منصة SaaS لشركات التوزيع في فلسطين (مبيعات ميدانية + توصيل). لكل شركة بياناتها المعزولة (`companyId` على كل سجل).
-هذا المستودع حالياً هو **الأساس (skeleton) لتطبيق الموبايل** فقط: Expo + expo-router، بالعربية فقط ومن اليمين لليسار، وكل البيانات وهمية (mock). لا يوجد خادم ولا تسجيل دخول حقيقي ولا استدعاءات ذكاء اصطناعي.
+تطبيق الموبايل هو **الأساس (skeleton)**: Expo + expo-router، بالعربية فقط ومن اليمين لليسار، وبياناته ما زالت وهمية (mock). أساس الخادم مستقل داخل `server/` ويعمل عبر Docker؛ انظر [تعليمات الخادم](server/README.md). لم يتم ربط الموبايل بالخادم بعد.
 
 ## التشغيل
 
@@ -77,7 +77,7 @@ src/
 
 ## لاحقاً
 
-- `server/` — Node + Socket.IO + PostgreSQL/PostGIS + Redis عبر docker-compose.
+- أساس `server/` متوفر الآن — Node + Socket.IO + PostgreSQL/PostGIS + Redis عبر Docker Compose؛ التعليمات في `server/README.md`.
 - `web-dashboard/` — لوحة ويب (React) للمدير والمحاسب.
 
 التطبيق حالياً في جذر المستودع؛ عند إضافة هذين المجلدين قد ننقله إلى `mobile/`.
@@ -86,11 +86,11 @@ src/
 
 ## English (short)
 
-Darb is a multi-tenant SaaS for Palestinian distribution companies (field sales + delivery). This repo is the **mobile app skeleton**: Expo SDK 57 + expo-router, React Native 0.86, React 19, strict TypeScript, Arabic-only RTL UI, mock data only (no backend, auth or AI calls).
+Darb is a multi-tenant SaaS for Palestinian distribution companies (field sales + delivery). The **mobile app skeleton** uses Expo SDK 57 + expo-router, React Native 0.86, React 19, strict TypeScript, Arabic-only RTL UI, and mock data. The independent backend foundation is now available in [server/](server/README.md); the mobile app is not connected to it yet.
 
 - Run: `npm install && npx expo start` (add `--web` for the browser/Leaflet map). Typecheck: `npm run typecheck`.
 - Screens in `app/`; shared UI, map, theme, i18n, services and mock data in `src/`. Screens read data through React Query hooks (`src/hooks/queries.ts`) backed by the typed `services` object; swap mock → HTTP in `src/services/index.ts`.
 - Role picker replaces login for now; tabs per role live in `src/components/navigation/roleTabs.ts`.
 - Team feature folders: `src/features/{ai,customers,roads,delivery,finance,admin}`.
-- Coming later: `server/` (Node + Socket.IO + PostgreSQL/PostGIS + Redis via docker-compose) and `web-dashboard/` (React).
+- Backend: [server/README.md](server/README.md) for Docker startup, permissions and real-service tests. `web-dashboard/` (React) remains future work.
 - Visual reference and stack versions come from the ParkFlow project; no ParkFlow branding or parking code is included.

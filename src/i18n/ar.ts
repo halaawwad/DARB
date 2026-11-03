@@ -30,6 +30,13 @@ export const ar = {
   'rolePicker.title': 'اختر دورك',
   'rolePicker.subtitle': 'نسخة تجريبية: اختيار الدور يحل محل تسجيل الدخول مؤقتاً.',
 
+  'login.title': 'تسجيل دخول المدير',
+  'login.email': 'البريد الإلكتروني',
+  'login.password': 'كلمة المرور',
+  'login.submit': 'تسجيل الدخول',
+  'login.success': 'Login Successful',
+  'login.failed': 'تعذّر تسجيل الدخول',
+
   'tabs.map': 'الخريطة',
   'tabs.customers': 'الزبائن',
   'tabs.orders': 'الطلبيات',
