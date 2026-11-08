@@ -44,6 +44,7 @@ export const openApiDocument = {
       Company: object({ id: uuid, slug: text, name: text, legalName: { ...text, nullable: true }, timezone: text, isActive: { type: 'boolean' }, createdAt: date, updatedAt: date }, ['id', 'slug', 'name']),
       User: object({ id: uuid, companyId: uuid, email: { type: 'string', format: 'email' }, firstName: text, lastName: text, fullName: text, phone: { ...text, nullable: true }, role: text }, ['id', 'companyId', 'email', 'firstName', 'lastName']),
       Login: object({ email: { type: 'string', format: 'email' }, password: { type: 'string', minLength: 8 }, companySlug: { type: 'string', description: 'Required when an email exists in more than one company.' } }, ['email', 'password']),
+      Register: object({ companyName: text, companySlug: text, firstName: text, lastName: text, email: { type: 'string', format: 'email' }, password: { type: 'string', minLength: 8, maxLength: 72 }, phone: text }, ['companyName', 'companySlug', 'firstName', 'lastName', 'email', 'password']),
       CustomerInput: customerInput, CustomerUpdate: { ...customerInput, required: [] }, Customer: customer,
       ProductInput: productInput, ProductUpdate: { ...productInput, required: [] }, Product: product,
       OrderItemInput: object({ productId: uuid, quantity: { type: 'number', exclusiveMinimum: true, minimum: 0 }, unitPrice: { oneOf: [{ type: 'string', pattern: '^\\d+(\\.\\d{1,2})?$' }, { type: 'number', minimum: 0, multipleOf: 0.01 }] } }, ['productId', 'quantity', 'unitPrice']),
@@ -58,7 +59,8 @@ export const openApiDocument = {
     '/health': { get: operation('Application liveness', undefined, object({ ok: { type: 'boolean' }, service: text, timestamp: date }, ['ok', 'service', 'timestamp']), '200', { security: [] }) },
     '/ready': { get: operation('Real PostgreSQL and Redis readiness', undefined, object({ ready: { type: 'boolean' }, database: text, redis: text }), '200', { security: [], responses: { '200': response('Dependencies available', object({ ready: { type: 'boolean' }, database: text, redis: text })), '503': response('Dependency unavailable', object({ ready: { type: 'boolean' }, error: text })) } }) },
     '/api/v1/auth/login': { post: operation('Log in an active user in an active company', undefined, object({ token: text, user: ref('User'), company: ref('Company') }, ['token', 'user', 'company']), '200', { security: [], requestBody: body(ref('Login')) }) },
-    '/api/v1/auth/me': { get: operation('Get the active authenticated user', undefined, object({ user: ref('User'), company: ref('Company') }, ['user', 'company'])) },
+    '/api/v1/auth/register': { post: operation('Create a company and its first manager; returns the same payload as login', undefined, object({ token: text, user: ref('User'), company: ref('Company') }, ['token', 'user', 'company']), '201', { security: [], requestBody: body(ref('Register')) }) },
+    '/api/v1/auth/me': { get: operation('Get the active authenticated user and effective permissions', undefined, object({ user: ref('User'), company: ref('Company'), permissions: { type: 'array', items: text } }, ['user', 'company', 'permissions'])) },
     '/api/v1/companies/current': { get: operation('Get current company', 'company:read', object({ company: ref('Company') }, ['company'])) },
     ...crud('customers', 'Customer'), ...crud('products', 'Product'),
     '/api/v1/orders': {

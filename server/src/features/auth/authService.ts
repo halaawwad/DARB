@@ -2,6 +2,8 @@ import { prisma } from '../../lib/prisma.js';
 import { hashPassword, verifyPassword } from '../../lib/hash.js';
 import { signToken } from '../../lib/jwt.js';
 import { HttpError } from '../../lib/errors.js';
+import { Prisma } from '@prisma/client';
+import { provisionCompanyPermissions } from './permissions.js';
 
 export async function login(email: string, password: string, companySlug?: string) {
   const users = await prisma.user.findMany({
@@ -74,4 +76,54 @@ export async function addSeedUser(input: { companyId: string; email: string; pas
   });
 
   return user;
+}
+
+export async function registerCompany(input: {
+  companyName: string;
+  companySlug: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone?: string;
+}) {
+  const passwordHash = await hashPassword(input.password);
+
+   const existingUser = await prisma.user.findFirst({ where: { email: input.email }, select: { id: true } });
+   if (existingUser) throw new HttpError(409, 'This email is already registered');
+
+  let company;
+  try {
+    company = await prisma.company.create({ data: { name: input.companyName, slug: input.companySlug } });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      throw new HttpError(409, 'This company code is already taken');
+    }
+    throw error;
+  }
+
+  try {
+    await provisionCompanyPermissions(prisma, company.id);
+    const managerRole = await prisma.role.findUniqueOrThrow({
+      where: { companyId_name: { companyId: company.id, name: 'manager' } },
+    });
+    await prisma.user.create({
+      data: {
+        companyId: company.id,
+        email: input.email,
+        passwordHash,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        phone: input.phone,
+        userRoles: { create: { roleId: managerRole.id } },
+      },
+    });
+  } catch (error) {
+    // Don't leave a half-created company behind; everything else cascades from it.
+    await prisma.company.delete({ where: { id: company.id } }).catch(() => undefined);
+    throw error;
+  }
+
+  // Same response shape as login, so the app can treat both the same way.
+  return login(input.email, input.password, input.companySlug);
 }
