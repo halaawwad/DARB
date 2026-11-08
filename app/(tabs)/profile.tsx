@@ -4,8 +4,10 @@ import { LayoutDashboard, Repeat } from 'lucide-react-native';
 
 import { AppButton, AppHeader, AppText, Avatar, Card, DetailRow, Screen, Segmented, StatusBadge } from '@/components/ui';
 import { TAB_BAR_CLEARANCE } from '@/components/navigation/TabBar';
+import { SignOutButton } from '@/components/ui/SignOutButton';
 import { useCompany, useCurrentUser } from '@/hooks/queries';
 import { useLocale } from '@/hooks/useLocale';
+import { useAuthStore } from '@/store/authStore';
 import { usePreferencesStore, type ThemeMode } from '@/store/preferencesStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import { radius } from '@/theme/radius';
@@ -18,6 +20,15 @@ export default function ProfileScreen() {
   const { data: user } = useCurrentUser();
   const { data: company } = useCompany();
   const setRole = usePreferencesStore((s) => s.setRole);
+  const authMode = useAuthStore((s) => s.mode);
+  const authUser = useAuthStore((s) => s.user);
+
+  // With a real login, show the signed-in account instead of the mock user.
+  const live = authMode === 'server' ? authUser : undefined;
+  const shownName = live?.fullName ?? user?.name;
+  const shownRole = live?.role ?? user?.role;
+  const shownCompany = live?.companyName ?? company?.name;
+  const shownPhone = live ? (live.phone ?? undefined) : user?.phone;
 
   const switchRole = () => {
     router.replace('/role');
@@ -30,19 +41,19 @@ export default function ProfileScreen() {
 
       <Card style={{ marginBottom: spacing.lg }}>
         <View style={{ flexDirection: row, alignItems: 'center', gap: spacing.lg, marginBottom: spacing.lg }}>
-          <Avatar name={user?.name} size={60} tone="deep" />
+          <Avatar name={shownName} size={60} tone="deep" />
           <View style={{ flex: 1, gap: spacing.xs }}>
-            <AppText variant="h2">{user?.name ?? ' '}</AppText>
-            {user ? <StatusBadge label={t(`role.${user.role}`)} tone="brand" showDot={false} /> : null}
+            <AppText variant="h2">{shownName ?? ' '}</AppText>
+            {shownRole ? <StatusBadge label={t(`role.${shownRole}`)} tone="brand" showDot={false} /> : null}
           </View>
         </View>
         <View style={{ gap: spacing.sm }}>
-          <DetailRow label={t('profile.company')} value={company?.name} />
-          <DetailRow label={t('profile.phone')} value={user?.phone} />
+          <DetailRow label={t('profile.company')} value={shownCompany} />
+          <DetailRow label={t('profile.phone')} value={shownPhone} />
         </View>
       </Card>
 
-      {user?.role === 'manager' ? (
+      {shownRole === 'manager' ? (
         <Card tone="brand" style={{ marginBottom: spacing.lg }}>
           <View style={{ flexDirection: row, alignItems: 'center', gap: spacing.md }}>
             <View
@@ -75,12 +86,17 @@ export default function ProfileScreen() {
         />
       </Card>
 
-      <AppButton
-        label={t('profile.switchRole')}
-        variant="secondary"
-        icon={<Repeat size={18} color={colors.text} strokeWidth={2.3} />}
-        onPress={switchRole}
-      />
+      <View style={{ gap: spacing.md }}>
+        {authMode === 'demo' ? (
+          <AppButton
+            label={t('profile.switchRole')}
+            variant="secondary"
+            icon={<Repeat size={18} color={colors.text} strokeWidth={2.3} />}
+            onPress={switchRole}
+          />
+        ) : null}
+        <SignOutButton />
+      </View>
     </Screen>
   );
 }
