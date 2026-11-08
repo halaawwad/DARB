@@ -163,6 +163,30 @@ export const ar = {
 
   'notFound.title': 'الصفحة غير موجودة',
   'notFound.action': 'العودة للرئيسية',
+
+  'auth.signOut': 'تسجيل الخروج',
+  'auth.signOutConfirm': 'هل تريد تسجيل الخروج؟',
+  'login.toSignup': 'شركة جديدة؟ أنشئ حساباً',
+  'login.invalid': 'البريد الإلكتروني أو كلمة المرور غير صحيح.',
+  'login.subtitle': 'سجّل الدخول بحسابك',
+  'login.checkFields': 'تحقق من البريد وكلمة المرور (8 أحرف على الأقل).',
+  'login.roleUnsupported': 'هذا الدور غير متوفر في تطبيق الموبايل بعد.',
+  'login.demo': 'وضع التجربة (بدون خادم)',
+  'signup.title': 'إنشاء حساب شركة',
+  'signup.subtitle': 'أنشئ شركتك وحساب المدير، ثم أضف موظفيك لاحقاً من لوحة الإدارة.',
+  'signup.companyName': 'اسم الشركة',
+  'signup.companyCode': 'رمز الشركة (أحرف إنجليزية صغيرة وأرقام و -)',
+  'signup.firstName': 'الاسم الأول',
+  'signup.lastName': 'اسم العائلة',
+  'signup.confirmPassword': 'تأكيد كلمة المرور',
+  'signup.submit': 'إنشاء الحساب',
+  'signup.failed': 'تعذّر إنشاء الحساب',
+  'signup.required': 'يرجى تعبئة جميع الحقول.',
+  'signup.codeInvalid': 'رمز الشركة: من 3 إلى 40 حرفاً إنجليزياً صغيراً أو أرقاماً أو شرطة (-).',
+  'signup.passwordShort': 'كلمة المرور يجب ألا تقل عن 8 أحرف.',
+  'signup.passwordMismatch': 'كلمتا المرور غير متطابقتين.',
+  'signup.codeTaken': 'رمز الشركة أو البريد الإلكتروني مستخدم مسبقاً.',
+  'signup.toLogin': 'لديك حساب؟ سجّل الدخول',
 } as const;
 
 export type TranslationKey = keyof typeof ar;
