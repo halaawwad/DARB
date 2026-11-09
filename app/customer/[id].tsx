@@ -18,16 +18,17 @@ import {
 } from '@/components/ui';
 import { OrderRow } from '@/components/domain/OrderRow';
 import { MapSurface } from '@/components/map/MapSurface';
-import { canTakeOrders } from '@/components/navigation/roleTabs';
+// import { canTakeOrders } from '@/components/navigation/roleTabs';
 import { useCustomer, useInsight, useLedger, useOrders, useUsers } from '@/hooks/queries';
 import { useLocale } from '@/hooks/useLocale';
-import { usePreferencesStore } from '@/store/preferencesStore';
+// import { usePreferencesStore } from '@/store/preferencesStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import { radius } from '@/theme/radius';
 import { spacing } from '@/theme/spacing';
 import type { Customer } from '@/types';
 import { formatDate, formatMoney } from '@/utils/format';
 import { customerStatusTone } from '@/utils/status';
+import { useHasPermission } from '@/hooks/useHasPermission';
 
 type Section = 'info' | 'orders' | 'ledger' | 'ai';
 
@@ -36,7 +37,7 @@ export default function CustomerProfileScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const { t, row } = useLocale();
-  const role = usePreferencesStore((s) => s.role);
+  const canOrder = useHasPermission('orders:create');
   const { data: customer, isLoading } = useCustomer(id);
   const [section, setSection] = useState<Section>('info');
 
@@ -62,7 +63,7 @@ export default function CustomerProfileScreen() {
       <AppHeader
         title={customer.shopName}
         trailing={
-          canTakeOrders(role) ? (
+           canOrder ? (
             <IconButton
               icon={<Mic size={19} color={colors.onBrand} strokeWidth={2.3} />}
               tone="brand"

@@ -1,11 +1,12 @@
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LayoutDashboard, Repeat } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, LayoutDashboard, Repeat } from 'lucide-react-native';
 
-import { AppButton, AppHeader, AppText, Avatar, Card, DetailRow, Screen, Segmented, StatusBadge } from '@/components/ui';
+import { AppButton, AppHeader, AppText, Avatar, Card, DetailRow, PressableScale, Screen, Segmented, StatusBadge } from '@/components/ui';
 import { TAB_BAR_CLEARANCE } from '@/components/navigation/TabBar';
 import { SignOutButton } from '@/components/ui/SignOutButton';
 import { useCompany, useCurrentUser } from '@/hooks/queries';
+import { useHasPermission } from '@/hooks/useHasPermission';
 import { useLocale } from '@/hooks/useLocale';
 import { useAuthStore } from '@/store/authStore';
 import { usePreferencesStore, type ThemeMode } from '@/store/preferencesStore';
@@ -16,12 +17,16 @@ import { spacing } from '@/theme/spacing';
 export default function ProfileScreen() {
   const router = useRouter();
   const { colors, mode, setMode } = useTheme();
-  const { t, row } = useLocale();
+  const { t, row, isRTL } = useLocale();
   const { data: user } = useCurrentUser();
   const { data: company } = useCompany();
   const setRole = usePreferencesStore((s) => s.setRole);
   const authMode = useAuthStore((s) => s.mode);
   const authUser = useAuthStore((s) => s.user);
+
+  // The admin card is shown by permission, not by role name.
+  const canManage = useHasPermission('users:read');
+  const Chevron = isRTL ? ChevronLeft : ChevronRight;
 
   // With a real login, show the signed-in account instead of the mock user.
   const live = authMode === 'server' ? authUser : undefined;
@@ -53,23 +58,30 @@ export default function ProfileScreen() {
         </View>
       </Card>
 
-      {shownRole === 'manager' ? (
-        <Card tone="brand" style={{ marginBottom: spacing.lg }}>
-          <View style={{ flexDirection: row, alignItems: 'center', gap: spacing.md }}>
-            <View
-              style={{ width: 44, height: 44, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.brandSoft }}
-            >
-              <LayoutDashboard size={22} color={colors.brand} strokeWidth={2.2} />
+      {canManage ? (
+        <PressableScale
+          onPress={() => router.push('/admin')}
+          accessibilityRole="button"
+          accessibilityLabel={t('profile.admin')}
+          style={{ marginBottom: spacing.lg }}
+        >
+          <Card tone="brand">
+            <View style={{ flexDirection: row, alignItems: 'center', gap: spacing.md }}>
+              <View
+                style={{ width: 44, height: 44, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.brandSoft }}
+              >
+                <LayoutDashboard size={22} color={colors.brand} strokeWidth={2.2} />
+              </View>
+              <View style={{ flex: 1, gap: 2 }}>
+                <AppText variant="titleLg">{t('profile.admin')}</AppText>
+                <AppText variant="bodySm" color="textSecondary">
+                  {t('profile.adminBody')}
+                </AppText>
+              </View>
+              <Chevron size={20} color={colors.brand} strokeWidth={2.4} />
             </View>
-            <View style={{ flex: 1, gap: 2 }}>
-              <AppText variant="titleLg">{t('profile.admin')}</AppText>
-              <AppText variant="bodySm" color="textSecondary">
-                {t('profile.adminBody')}
-              </AppText>
-            </View>
-            <StatusBadge label={t('common.comingSoon')} tone="warning" size="sm" />
-          </View>
-        </Card>
+          </Card>
+        </PressableScale>
       ) : null}
 
       <Card style={{ marginBottom: spacing.xl, gap: spacing.md }}>
