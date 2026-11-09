@@ -6,6 +6,7 @@ export const PERMISSION_KEYS = [
   'products:read', 'products:write', 'products:delete',
   'orders:read', 'orders:create',
   'checkpoints:read', 'incidents:create',
+  'users:read', 'users:write', 'roles:write',
 ] as const;
 
 export type PermissionKey = (typeof PERMISSION_KEYS)[number];
