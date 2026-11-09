@@ -5,6 +5,8 @@ import customersRouter from './customers.js';
 import productsRouter from './products.js';
 import ordersRouter from './orders.js';
 import checkpointsRouter from './checkpoints.js';
+import usersRouter from './users.js';
+import rolesRouter from './roles.js';
 
 const router = Router();
 
@@ -14,5 +16,10 @@ router.use('/customers', customersRouter);
 router.use('/products', productsRouter);
 router.use('/orders', ordersRouter);
 router.use('/checkpoints', checkpointsRouter);
+router.use('/users', usersRouter);
+router.use('/roles', rolesRouter);
+
+
+
 
 export default router;

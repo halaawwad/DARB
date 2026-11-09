@@ -4,6 +4,7 @@ export const permissionKeys = [
   'company:read', 'customers:read', 'customers:write', 'customers:delete',
   'customers:balance', 'products:read', 'products:write', 'products:delete',
   'orders:read', 'orders:create', 'checkpoints:read', 'incidents:create',
+  'users:read', 'users:write', 'roles:write',
 ] as const;
 export type PermissionKey = typeof permissionKeys[number];
 
@@ -36,3 +37,5 @@ export async function provisionCompanyPermissions(db: PrismaClient, companyId: s
     }
   });
 }
+
+export const ADMIN_ROLES = ['manager', 'admin'];

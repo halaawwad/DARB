@@ -50,7 +50,8 @@
         {
           "locationWhenInUsePermission": "Darb uses your location to show you on the map next to your customers and today's route."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": false

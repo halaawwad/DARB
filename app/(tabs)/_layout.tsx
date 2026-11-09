@@ -2,6 +2,7 @@ import { Redirect, Tabs } from 'expo-router';
 import { TabBar } from '@/components/navigation/TabBar';
 import { ROLE_TABS, type TabName } from '@/components/navigation/roleTabs';
 import { usePreferencesStore } from '@/store/preferencesStore';
+import { useAuthStore } from '@/store/authStore';
 
 /**
  * Tabs change by role (see roleTabs). The tab bar is fully custom, so the
@@ -9,8 +10,10 @@ import { usePreferencesStore } from '@/store/preferencesStore';
  * hidden tabs out of linking.
  */
 export default function TabsLayout() {
-  const role = usePreferencesStore((s) => s.role);
-  if (!role) return <Redirect href="/role" />;
+ const role = usePreferencesStore((s) => s.role);
+ const authStatus = useAuthStore((s) => s.status);
+
+ if (!role) return <Redirect href={authStatus === 'signedOut' ? '/login' : '/role'} />;
 
   const hidden = (tab: TabName) => (ROLE_TABS[role].includes(tab) ? undefined : null);
 

@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
-import { View } from 'react-native';
-import { Stack } from 'expo-router';
+import { useEffect, useRef } from 'react';
+import { AppState, View } from 'react-native';
+import { Stack, useRouter } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { refreshUser, useAuthStore } from '@/store/authStore';
 import * as SplashScreen from 'expo-splash-screen';
 import {
   useFonts,
@@ -30,6 +31,15 @@ const queryClient = new QueryClient({
 function RootNavigator() {
   const { colors } = useTheme();
   const { isRTL } = useLocale();
+  const router = useRouter();
+  const authStatus = useAuthStore((s) => s.status);
+  const previousAuthStatus = useRef(authStatus);
+
+  // Any signed-in -> signed-out change (sign-out button or expired token) goes back to login.
+  useEffect(() => {
+    if (previousAuthStatus.current === 'signedIn' && authStatus === 'signedOut') router.replace('/login');
+    previousAuthStatus.current = authStatus;
+  }, [authStatus, router]);
 
   return (
     <Stack
@@ -41,10 +51,15 @@ function RootNavigator() {
       }}
     >
       <Stack.Screen name="index" />
+      <Stack.Screen name="login" options={{ animation: 'fade' }} />
+      <Stack.Screen name="signup" />
       <Stack.Screen name="role" options={{ animation: 'fade' }} />
       <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
       <Stack.Screen name="customer/[id]" />
       <Stack.Screen name="voice-order" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+      <Stack.Screen name="admin/index" />
+      <Stack.Screen name="admin/employee" />
+      <Stack.Screen name="admin/roles" />
       <Stack.Screen name="+not-found" />
     </Stack>
   );
@@ -58,6 +73,8 @@ function AppShell() {
     IBMPlexSansArabic_600SemiBold,
     IBMPlexSansArabic_700Bold,
   });
+
+  const authStatus = useAuthStore((s) => s.status);
   const prefsHydrated = usePreferencesStore((s) => s.hydrated);
 
   // Safety net: if storage rehydration never reports back (corrupt store, web
@@ -69,9 +86,23 @@ function AppShell() {
     return () => clearTimeout(timer);
   }, []);
 
+
+// Restore the saved session once preferences are readable (demo mode needs the saved role).
+useEffect(() => {
+  if (prefsHydrated) void useAuthStore.getState().restore();
+}, [prefsHydrated]);
+
+  // When the app returns to the foreground, pick up permission changes made by a manager meanwhile.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active' && useAuthStore.getState().mode === 'server') void refreshUser();
+    });
+    return () => subscription.remove();
+  }, []);
+
   // A font download failure must not hold the app hostage — the system font
   // still renders, so an error counts as "done loading".
-  const ready = (fontsLoaded || Boolean(fontError)) && prefsHydrated;
+ const ready = (fontsLoaded || Boolean(fontError)) && prefsHydrated && authStatus !== 'loading';
 
   useEffect(() => {
     if (ready) void SplashScreen.hideAsync();
