@@ -43,7 +43,7 @@ async function clearStoredSession() {
 }
 
 /** Background refresh of grants. Offline = keep the cached user; a 401 signs out via configureApiAuth. */
-async function refreshUser() {
+export async function refreshUser() {
   try {
     const user = await fetchMe();
     if (useAuthStore.getState().mode !== 'server') return;
