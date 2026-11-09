@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { View } from 'react-native';
+import { AppState, View } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useAuthStore } from '@/store/authStore';
+import { refreshUser, useAuthStore } from '@/store/authStore';
 import * as SplashScreen from 'expo-splash-screen';
 import {
   useFonts,
@@ -57,6 +57,9 @@ function RootNavigator() {
       <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
       <Stack.Screen name="customer/[id]" />
       <Stack.Screen name="voice-order" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+      <Stack.Screen name="admin/index" />
+      <Stack.Screen name="admin/employee" />
+      <Stack.Screen name="admin/roles" />
       <Stack.Screen name="+not-found" />
     </Stack>
   );
@@ -89,6 +92,13 @@ useEffect(() => {
   if (prefsHydrated) void useAuthStore.getState().restore();
 }, [prefsHydrated]);
 
+  // When the app returns to the foreground, pick up permission changes made by a manager meanwhile.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active' && useAuthStore.getState().mode === 'server') void refreshUser();
+    });
+    return () => subscription.remove();
+  }, []);
 
   // A font download failure must not hold the app hostage — the system font
   // still renders, so an error counts as "done loading".
