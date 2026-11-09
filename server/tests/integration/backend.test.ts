@@ -130,7 +130,7 @@ describe.sequential('real Docker backend integration', () => {
     expect((await api('GET', '/ready')).body).toMatchObject({ ready: true, database: 'ok', redis: 'ok' });
     const document = await api('GET', '/openapi.json');
     expect(document.status).toBe(200);
-    expect(Object.keys(document.body.paths)).toHaveLength(15);
+    expect(Object.keys(document.body.paths)).toHaveLength(20);
     expect(document.body.components.securitySchemes.bearerAuth.scheme).toBe('bearer');
     expect(document.body.servers).toEqual([{ url: '/' }]);
     expect((await api('GET', '/docs/')).status).toBe(200);
