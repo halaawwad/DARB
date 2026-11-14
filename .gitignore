@@ -48,3 +48,7 @@ Desktop.ini
 .idea/
 
 coverage/
+
+# Private local demo credentials and device runtime
+/.local/
+/.tools/
