@@ -157,3 +157,21 @@ those tenants, and checks actual HTTP, sockets, SQL constraints, PostGIS and Red
 NX/TTL behavior. Fixtures are retained for inspection; their users are disabled
 after the run. No business records are deleted. Test Redis keys expire. Do not
 point integration tests at production data or another Docker project.
+
+
+## Finance permissions
+
+The finance module adds explicit `finance:read`, `finance:collect`, and `finance:manage` grants. Manager/admin get all three; accountant gets all three; sales/delivery get read and collect; warehouse gets read for inspection and cannot collect. Cheque resolution requires manage. Return requests and warehouse decisions use the explicit returns:create and returns:review grants described below. Receipt, invoice and cash handover require collect. Offline order creation requires orders:create. Every finance operation also requires finance:read, and its actorId must match the active authenticated user. Existing companies receive these grants only through the explicit provisioning CLI. Operation IDs are checked against company-scoped audit payloads; reusing an ID with changed content fails. No financial permissions are inferred from the UI role picker.
+
+
+## Return inspection authorization
+
+returns:create is granted in the reviewed baseline to manager/admin, accountant, sales_rep and delivery_rep. returns:review is granted to manager/admin and warehouse_staff. Warehouse also receives finance:read for this company-scoped workspace; it has no finance:collect or finance:manage grant. The frontend warehouse entry point shows returns and sync only. Existing companies require explicit provisioning to add these grants; no auto-escalation is performed. Return creators cannot review their own requests, regardless of role. All existing tenant/user activity and actor checks still apply. A pending request never credits the balance; a single accepted review credits the original amount atomically under the tenant lock. Pending/accepted quantities reserve stock; rejected quantities are released. Prior returns without a status retain their historical accepted/credited meaning.
+
+
+## Automatic sale-record return policy
+
+Sale-record-only matching creates a pending request without financial credit. Automatic credit requires the unique unit identifiers described below. Existing historical accepted returns are preserved.
+
+## Unique sold-unit tracking
+New finance invoices store one unique identifier per sales unit in the transactionally persisted workspace. Print the invoice and attach identifiers to the matching pieces/cartons before delivery. The current UI accepts typed or keyboard-scanner input, not camera scanning. Automatic return acceptance now requires verification=unit_codes and exact codes matching customer, invoice, product and quantity. Pending requests reserve codes; rejection releases them; acceptance credits once. Old sales_record clients create pending requests only. Historical invoices are not backfilled and historical accepted returns are preserved. unitIdentityVerified means a recorded identifier matched; physicalIdentityVerified remains false because copied labels and physical condition cannot be authenticated by this software.

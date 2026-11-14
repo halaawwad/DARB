@@ -77,7 +77,7 @@ The CLI provisioning idempotency and every default role's grants are checked,
 including foreign-company grants and zero-permission rejection.
 
 Swagger UI: `http://localhost:3001/docs/`. OpenAPI JSON:
-`http://localhost:3001/openapi.json`. It documents 15 implemented paths, bearer
+`http://localhost:3001/openapi.json`. It documents 17 implemented paths, bearer
 authentication and the relative API server `/`. Future finance/delivery/offline
 modules are not presented as implemented endpoints.
 
@@ -86,3 +86,8 @@ Dependency decisions and final executed results are recorded in
 non-destructive constraint validation procedure are in [SECURITY.md](SECURITY.md).
 Do not validate that constraint by deleting/reassigning data without owner
 approval. No volume deletion or global Docker cleanup is needed.
+
+
+## Finance workspace
+
+`GET /api/v1/finance` and `POST /api/v1/finance/sync` require a bearer session and explicit company-scoped finance grants. The new migration creates `finance_workspaces`. Monetary amounts are integer agorot in the API; operation UUIDs provide idempotency. The workspace, audit log, customer balance, and issued invoice/offline sales order commit atomically under a tenant advisory lock. See [the finance guide](../src/features/finance/README.md) for behavior, local account setup, tests, and limits. Existing installations must explicitly reprovision one selected company to receive the new baseline grants; there is no automatic role escalation.
