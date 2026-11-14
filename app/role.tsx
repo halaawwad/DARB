@@ -1,7 +1,7 @@
 import { useRef, useState, type ComponentType } from 'react';
 import { Alert, Keyboard, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Briefcase, Calculator, ShoppingBag, Truck } from 'lucide-react-native';
+import { Warehouse, Briefcase, Calculator, ShoppingBag, Truck } from 'lucide-react-native';
 
 import { AppButton, AppText, BottomSheet, Card, Screen } from '@/components/ui';
 import { homeRoute } from '@/components/navigation/roleTabs';
@@ -19,6 +19,7 @@ const ICONS: Record<Role, ComponentType<{ size: number; color: string; strokeWid
   sales_rep: ShoppingBag,
   delivery_rep: Truck,
   accountant: Calculator,
+  warehouse_staff: Warehouse,
 };
 
 /** Existing demo role navigation, with a temporary real login test for Manager. */
@@ -61,13 +62,20 @@ export default function RoleScreen() {
     Keyboard.dismiss();
     try {
       const name = await testLogin(email, password);
-      Alert.alert(t('login.success'), name, [{
-        text: t('common.continue'),
-        onPress: () => {
-          setLoginVisible(false);
-          choose('manager');
-        },
-      }], { cancelable: false });
+      Alert.alert(
+        t('login.success'),
+        name,
+        [
+          {
+            text: t('common.continue'),
+            onPress: () => {
+              setLoginVisible(false);
+              choose('manager');
+            },
+          },
+        ],
+        { cancelable: false },
+      );
     } catch (error) {
       Alert.alert(t('login.failed'), error instanceof ApiError ? error.message : t('common.somethingWrong'));
     } finally {
@@ -91,7 +99,11 @@ export default function RoleScreen() {
       </View>
 
       <AppText variant="h2">{t('rolePicker.title')}</AppText>
-      <AppText variant="bodySm" color="textSecondary" style={{ marginTop: spacing.xs, marginBottom: spacing.lg }}>
+      <AppText
+        variant="bodySm"
+        color="textSecondary"
+        style={{ marginTop: spacing.xs, marginBottom: spacing.lg }}
+      >
         {t('rolePicker.subtitle')}
       </AppText>
 
@@ -99,7 +111,12 @@ export default function RoleScreen() {
         {ROLES.map((role) => {
           const Icon = ICONS[role];
           return (
-            <Card key={role} onPress={() => role === 'manager' ? openManagerLogin() : choose(role)} accessibilityLabel={t(`role.${role}`)} padding="lg">
+            <Card
+              key={role}
+              onPress={() => (role === 'manager' ? openManagerLogin() : choose(role))}
+              accessibilityLabel={t(`role.${role}`)}
+              padding="lg"
+            >
               <View style={{ flexDirection: row, alignItems: 'center', gap: spacing.md }}>
                 <View
                   style={{
@@ -125,7 +142,13 @@ export default function RoleScreen() {
         })}
       </View>
 
-      <BottomSheet visible={loginVisible} onClose={closeLogin} title={t('login.title')} dismissible={!submitting} scrollable>
+      <BottomSheet
+        visible={loginVisible}
+        onClose={closeLogin}
+        title={t('login.title')}
+        dismissible={!submitting}
+        scrollable
+      >
         <View style={{ gap: spacing.md }}>
           <AppText variant="label">{t('login.email')}</AppText>
           <TextInput
@@ -139,7 +162,16 @@ export default function RoleScreen() {
             textContentType="none"
             importantForAutofill="no"
             editable={!submitting}
-            style={{ color: colors.text, backgroundColor: colors.surface, borderColor: colors.borderStrong, borderWidth: 1, borderRadius: radius.md, padding: spacing.md, fontSize: 16, textAlign: 'left' }}
+            style={{
+              color: colors.text,
+              backgroundColor: colors.surface,
+              borderColor: colors.borderStrong,
+              borderWidth: 1,
+              borderRadius: radius.md,
+              padding: spacing.md,
+              fontSize: 16,
+              textAlign: 'left',
+            }}
           />
           <AppText variant="label">{t('login.password')}</AppText>
           <TextInput
@@ -153,11 +185,27 @@ export default function RoleScreen() {
             textContentType="none"
             importantForAutofill="no"
             editable={!submitting}
-            onSubmitEditing={() => { if (email.trim() && password) void submitLogin(); }}
+            onSubmitEditing={() => {
+              if (email.trim() && password) void submitLogin();
+            }}
             returnKeyType="go"
-            style={{ color: colors.text, backgroundColor: colors.surface, borderColor: colors.borderStrong, borderWidth: 1, borderRadius: radius.md, padding: spacing.md, fontSize: 16, textAlign: 'left' }}
+            style={{
+              color: colors.text,
+              backgroundColor: colors.surface,
+              borderColor: colors.borderStrong,
+              borderWidth: 1,
+              borderRadius: radius.md,
+              padding: spacing.md,
+              fontSize: 16,
+              textAlign: 'left',
+            }}
           />
-          <AppButton label={t('login.submit')} loading={submitting} disabled={!email.trim() || !password} onPress={() => void submitLogin()} />
+          <AppButton
+            label={t('login.submit')}
+            loading={submitting}
+            disabled={!email.trim() || !password}
+            onPress={() => void submitLogin()}
+          />
           <AppButton label={t('common.cancel')} variant="ghost" disabled={submitting} onPress={closeLogin} />
         </View>
       </BottomSheet>

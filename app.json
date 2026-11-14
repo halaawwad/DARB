@@ -25,12 +25,7 @@
       "adaptiveIcon": {
         "backgroundColor": "#0F1C36"
       },
-      "permissions": [
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION",
-        "RECORD_AUDIO",
-        "VIBRATE"
-      ]
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "RECORD_AUDIO", "VIBRATE"]
     },
     "web": {
       "bundler": "metro"
@@ -49,6 +44,16 @@
         "expo-location",
         {
           "locationWhenInUsePermission": "Darb uses your location to show you on the map next to your customers and today's route."
+        }
+      ],
+      "expo-sharing",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "يحتاج درب للوصول إلى الصور لإرفاق صورة إثبات المرتجع.",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ]
     ],

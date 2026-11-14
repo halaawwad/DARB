@@ -3,7 +3,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 import type { BottomTabBarProps } from 'expo-router/tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
-import { ClipboardList, Map, Truck, User, Users } from 'lucide-react-native';
+import { Wallet, ClipboardList, Map, Truck, User, Users } from 'lucide-react-native';
 
 import { AppText } from '@/components/ui/AppText';
 import { PressableScale } from '@/components/ui/PressableScale';
@@ -19,6 +19,7 @@ import type { Role } from '@/types';
 import { ROLE_TABS, tabLabel, type TabName } from './roleTabs';
 
 const ICONS: Record<TabName, typeof Map> = {
+  finance: Wallet,
   map: Map,
   customers: Users,
   orders: ClipboardList,
@@ -64,19 +65,36 @@ function TabItem({
       accessibilityRole="tab"
       accessibilityState={{ selected: focused }}
       accessibilityLabel={label}
-      style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3, paddingVertical: spacing.sm, minHeight: 52 }}
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 3,
+        paddingVertical: spacing.sm,
+        minHeight: 52,
+      }}
     >
       <View style={{ width: 48, height: 28, alignItems: 'center', justifyContent: 'center' }}>
         <Animated.View
           pointerEvents="none"
           style={[
             // Beige pill behind the navy active icon (surfaceAlt = beige100 in light mode).
-            { position: 'absolute', width: 48, height: 28, borderRadius: radius.pill, backgroundColor: colors.surfaceAlt },
+            {
+              position: 'absolute',
+              width: 48,
+              height: 28,
+              borderRadius: radius.pill,
+              backgroundColor: colors.surfaceAlt,
+            },
             pillStyle,
           ]}
         />
         <Animated.View style={iconStyle}>
-          <Icon size={20} color={focused ? colors.brand : colors.textTertiary} strokeWidth={focused ? 2.3 : 1.9} />
+          <Icon
+            size={20}
+            color={focused ? colors.brand : colors.textTertiary}
+            strokeWidth={focused ? 2.3 : 1.9}
+          />
         </Animated.View>
       </View>
 

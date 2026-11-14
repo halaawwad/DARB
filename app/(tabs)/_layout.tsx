@@ -22,6 +22,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="map" options={{ href: hidden('map') }} />
       <Tabs.Screen name="customers" options={{ href: hidden('customers') }} />
       <Tabs.Screen name="orders" options={{ href: hidden('orders') }} />
+      <Tabs.Screen name="finance" options={{ href: hidden('finance') }} />
       <Tabs.Screen name="profile" options={{ href: hidden('profile') }} />
     </Tabs>
   );

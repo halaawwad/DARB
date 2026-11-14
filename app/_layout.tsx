@@ -1,3 +1,4 @@
+import { FinanceSync } from '@/features/finance/hooks';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import { Stack } from 'expo-router';
@@ -90,6 +91,7 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
+            <FinanceSync />
             <AppShell />
           </ThemeProvider>
         </QueryClientProvider>

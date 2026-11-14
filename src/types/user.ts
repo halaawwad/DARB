@@ -1,6 +1,6 @@
-export type Role = 'manager' | 'sales_rep' | 'delivery_rep' | 'accountant';
+export type Role = 'manager' | 'sales_rep' | 'delivery_rep' | 'accountant' | 'warehouse_staff';
 
-export const ROLES: Role[] = ['manager', 'sales_rep', 'delivery_rep', 'accountant'];
+export const ROLES: Role[] = ['manager', 'sales_rep', 'delivery_rep', 'accountant', 'warehouse_staff'];
 
 /** A distribution company. Every record carries its `companyId`; data never crosses companies. */
 export interface Company {

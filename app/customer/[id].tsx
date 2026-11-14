@@ -1,3 +1,6 @@
+import { useFinance } from '@/features/finance/hooks';
+import { balance as financeBalance } from '@/features/finance/domain';
+import { AppButton } from '@/components/ui';
 import { useState } from 'react';
 import { ActivityIndicator, Linking, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -38,6 +41,11 @@ export default function CustomerProfileScreen() {
   const { t, row } = useLocale();
   const role = usePreferencesStore((s) => s.role);
   const { data: customer, isLoading } = useCustomer(id);
+  const finance = useFinance();
+  const liveBalance =
+    customer && finance.mode === 'demo' && finance.state
+      ? financeBalance(finance.state, customer.id) / 100
+      : (customer?.balance ?? 0);
   const [section, setSection] = useState<Section>('info');
 
   if (isLoading) {
@@ -52,7 +60,10 @@ export default function CustomerProfileScreen() {
     return (
       <Screen>
         <AppHeader />
-        <EmptyState icon={<UserX size={26} color={colors.brand} strokeWidth={2.2} />} title={t('customer.notFound')} />
+        <EmptyState
+          icon={<UserX size={26} color={colors.brand} strokeWidth={2.2} />}
+          title={t('customer.notFound')}
+        />
       </Screen>
     );
   }
@@ -93,10 +104,24 @@ export default function CustomerProfileScreen() {
             accessibilityLabel={t('common.call')}
           />
         </View>
-        <View style={{ flexDirection: row, alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.md }}>
-          <StatusBadge label={t(`customer.status.${customer.status}`)} tone={customerStatusTone[customer.status]} />
-          <AppText variant="titleLg" numeric style={{ color: customer.balance > 0 ? colors.dangerText : colors.text }}>
-            {formatMoney(customer.balance)}
+        <View
+          style={{
+            flexDirection: row,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: spacing.md,
+          }}
+        >
+          <StatusBadge
+            label={t(`customer.status.${customer.status}`)}
+            tone={customerStatusTone[customer.status]}
+          />
+          <AppText
+            variant="titleLg"
+            numeric
+            style={{ color: liveBalance > 0 ? colors.dangerText : colors.text }}
+          >
+            {formatMoney(liveBalance)}
           </AppText>
         </View>
       </Card>
@@ -116,7 +141,16 @@ export default function CustomerProfileScreen() {
 
       {section === 'info' ? <InfoSection customer={customer} /> : null}
       {section === 'orders' ? <OrdersSection customerId={customer.id} /> : null}
-      {section === 'ledger' ? <LedgerSection customer={customer} /> : null}
+      {section === 'ledger' ? (
+        <>
+          <AppButton
+            label={t('finance.ledger')}
+            variant="tonal"
+            onPress={() => router.push({ pathname: '/(tabs)/finance', params: { customerId: customer.id } })}
+          />
+          <LedgerSection customer={{ ...customer, balance: liveBalance }} />
+        </>
+      ) : null}
       {section === 'ai' ? <InsightSection customerId={customer.id} /> : null}
     </Screen>
   );
@@ -133,13 +167,25 @@ function InfoSection({ customer }: { customer: Customer }) {
         <DetailRow stacked label={t('customer.address')} value={customer.address} />
         <DetailRow stacked label={t('customer.preferredVisitTime')} value={customer.preferredVisitTime} />
         <DetailRow stacked label={t('customer.assignedRep')} value={rep?.name ?? '—'} />
-        <DetailRow stacked label={t('customer.lastVisit')} value={formatDate(customer.lastVisit, dateLocale)} />
+        <DetailRow
+          stacked
+          label={t('customer.lastVisit')}
+          value={formatDate(customer.lastVisit, dateLocale)}
+        />
         {customer.notes ? <DetailRow stacked label={t('customer.notes')} value={customer.notes} /> : null}
       </Card>
       <MapSurface
         interactive={false}
         region={{ ...customer.location, latitudeDelta: 0.008, longitudeDelta: 0.008 }}
-        customers={[{ id: customer.id, location: customer.location, status: customer.status, label: customer.shopName, highlighted: true }]}
+        customers={[
+          {
+            id: customer.id,
+            location: customer.location,
+            status: customer.status,
+            label: customer.shopName,
+            highlighted: true,
+          },
+        ]}
         style={{ height: 180, borderRadius: radius.xl, overflow: 'hidden' }}
       />
     </View>
@@ -200,11 +246,16 @@ function LedgerSection({ customer }: { customer: Customer }) {
                     {entry.description}
                   </AppText>
                   <AppText variant="caption" color="textTertiary" numeric>
-                    {formatDate(entry.date, dateLocale)} · {t('ledger.running', { amount: formatMoney(balance) })}
+                    {formatDate(entry.date, dateLocale)} ·{' '}
+                    {t('ledger.running', { amount: formatMoney(balance) })}
                   </AppText>
                 </View>
                 <View style={{ alignItems: alignEnd, gap: 2 }}>
-                  <AppText variant="title" numeric style={{ color: isDebit ? colors.dangerText : colors.successText }}>
+                  <AppText
+                    variant="title"
+                    numeric
+                    style={{ color: isDebit ? colors.dangerText : colors.successText }}
+                  >
                     {formatMoney(isDebit ? entry.debit : entry.credit)}
                   </AppText>
                   <AppText variant="caption" color="textTertiary">
@@ -229,7 +280,14 @@ function InsightSection({ customerId }: { customerId: string }) {
   if (!insight) return <EmptyState compact title={t('ai.empty')} />;
 
   const header = (title: string) => (
-    <View style={{ flexDirection: row, alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.sm }}>
+    <View
+      style={{
+        flexDirection: row,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: spacing.sm,
+      }}
+    >
       <View style={{ flexDirection: row, alignItems: 'center', gap: spacing.sm }}>
         <Sparkles size={18} color={colors.accent} strokeWidth={2.3} />
         <AppText variant="titleLg">{title}</AppText>
@@ -255,8 +313,24 @@ function InsightSection({ customerId }: { customerId: string }) {
         <AppText variant="h1" color="brand" numeric>
           {t('ai.score', { score: insight.satisfactionScore })}
         </AppText>
-        <View style={{ height: 8, borderRadius: radius.pill, backgroundColor: colors.track, marginVertical: spacing.sm, overflow: 'hidden' }}>
-          <View style={{ width: `${insight.satisfactionScore}%`, height: '100%', backgroundColor: colors.brand, borderRadius: radius.pill, alignSelf: row === 'row-reverse' ? 'flex-end' : 'flex-start' }} />
+        <View
+          style={{
+            height: 8,
+            borderRadius: radius.pill,
+            backgroundColor: colors.track,
+            marginVertical: spacing.sm,
+            overflow: 'hidden',
+          }}
+        >
+          <View
+            style={{
+              width: `${insight.satisfactionScore}%`,
+              height: '100%',
+              backgroundColor: colors.brand,
+              borderRadius: radius.pill,
+              alignSelf: row === 'row-reverse' ? 'flex-end' : 'flex-start',
+            }}
+          />
         </View>
         <AppText variant="bodySm" color="textSecondary">
           {insight.satisfactionNote}

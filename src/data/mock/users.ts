@@ -3,6 +3,7 @@ import type { Company, Role, TodayPlan, User } from '@/types';
 export const COMPANY: Company = { id: 'co_najma', name: 'شركة النجمة للتوزيع' };
 
 export const USERS: User[] = [
+  { id: 'u_warehouse', companyId: COMPANY.id, name: 'مسؤول المستودع', role: 'warehouse_staff', phone: '' },
   { id: 'u_manager', companyId: COMPANY.id, name: 'سامي الخطيب', role: 'manager', phone: '0599 120 450' },
   { id: 'u_sales', companyId: COMPANY.id, name: 'محمود عودة', role: 'sales_rep', phone: '0598 334 210' },
   { id: 'u_delivery', companyId: COMPANY.id, name: 'رامي نصار', role: 'delivery_rep', phone: '0597 551 902' },
