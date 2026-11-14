@@ -1,3 +1,4 @@
+import financeRouter from './finance.js';
 import { Router } from 'express';
 import authRouter from './auth.js';
 import companiesRouter from './companies.js';
@@ -8,6 +9,7 @@ import checkpointsRouter from './checkpoints.js';
 
 const router = Router();
 
+router.use('/finance', financeRouter);
 router.use('/auth', authRouter);
 router.use('/companies', companiesRouter);
 router.use('/customers', customersRouter);

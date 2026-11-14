@@ -3,8 +3,11 @@ import { openApiDocument } from '../../src/openapi.js';
 
 describe('OpenAPI contract', () => {
   it('defines all implemented route paths and bearer security', () => {
-    expect(Object.keys(openApiDocument.paths)).toHaveLength(15);
-    expect(openApiDocument.components.securitySchemes.bearerAuth).toMatchObject({ type: 'http', scheme: 'bearer' });
+    expect(Object.keys(openApiDocument.paths)).toHaveLength(17);
+    expect(openApiDocument.components.securitySchemes.bearerAuth).toMatchObject({
+      type: 'http',
+      scheme: 'bearer',
+    });
     expect(openApiDocument.servers).toEqual([{ url: '/' }]);
   });
   it('has resolved schema references and documented permission errors', () => {

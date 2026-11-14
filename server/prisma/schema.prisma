@@ -28,6 +28,7 @@ model Company {
   incidents   RoadIncident[]
   notifications Notification[]
   auditLogs   AuditLog[]
+  financeWorkspace FinanceWorkspace?
   syncOps     SyncOperation[]
 
   @@map("companies")
@@ -558,4 +559,13 @@ model AiAnalysis {
   createdAt   DateTime  @default(now()) @db.Timestamptz(6)
 
   @@map("ai_analyses")
+}
+
+model FinanceWorkspace {
+  companyId String @id @db.Uuid
+  state Json
+  revision Int @default(0)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  @@map("finance_workspaces")
 }
